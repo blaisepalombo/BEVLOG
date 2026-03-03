@@ -1,3 +1,4 @@
+// src/routes/auth.routes.js
 const { Router } = require("express");
 const passport = require("passport");
 
@@ -8,10 +9,7 @@ const router = Router();
  * @summary Login with Google
  * @tags Auth
  */
-router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
 /**
  * GET /auth/google/callback
@@ -22,7 +20,6 @@ router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/auth/failed" }),
   (req, res) => {
-    // Successful login
     res.redirect("/auth/success");
   }
 );
@@ -36,7 +33,7 @@ router.get("/me", (req, res) => {
   if (req.isAuthenticated && req.isAuthenticated()) {
     return res.status(200).json({ user: req.user });
   }
-  return res.status(200).json({ user: null });
+  return res.status(401).json({ message: "Not logged in", user: null });
 });
 
 /**
@@ -45,17 +42,29 @@ router.get("/me", (req, res) => {
  * @tags Auth
  */
 router.post("/logout", (req, res, next) => {
-  // passport logout is async in newer versions
   req.logout((err) => {
     if (err) return next(err);
-    res.status(200).json({ message: "Logged out" });
+
+    req.session?.destroy((destroyErr) => {
+      if (destroyErr) return next(destroyErr);
+
+      res.clearCookie("sid"); // matches server.js session cookie name
+      return res.status(200).json({ message: "Logged out" });
+    });
   });
 });
 
+// Optional GET logout for browser testing
 router.get("/logout", (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
-    res.status(200).send("Logged out. You can close this tab.");
+
+    req.session?.destroy((destroyErr) => {
+      if (destroyErr) return next(destroyErr);
+
+      res.clearCookie("sid");
+      return res.status(200).send("Logged out. You can close this tab.");
+    });
   });
 });
 

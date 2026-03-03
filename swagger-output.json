@@ -10,6 +10,14 @@
   "schemes": [
     "http"
   ],
+  "securityDefinitions": {
+    "cookieAuth": {
+      "type": "apiKey",
+      "in": "cookie",
+      "name": "sid",
+      "description": "Session cookie set after logging in via /auth/google. Open /auth/google in the browser first, then use Swagger in the same browser session."
+    }
+  },
   "paths": {
     "/drinks/": {
       "get": {
@@ -212,6 +220,9 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }

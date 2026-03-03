@@ -1,3 +1,5 @@
+// src/db/users.js
+const { ObjectId } = require("mongodb");
 const { getDb } = require("./mongodb");
 
 const COLLECTION = "users";
@@ -6,7 +8,7 @@ async function findOrCreateUserFromGoogle(profile) {
   const db = getDb();
 
   const provider = "google";
-  const providerId = profile.id;
+  const providerId = String(profile.id);
 
   const email =
     Array.isArray(profile.emails) && profile.emails.length > 0
@@ -35,7 +37,13 @@ async function findOrCreateUserFromGoogle(profile) {
 
 async function getUserById(id) {
   const db = getDb();
-  // id here is whatever we store in session (stringified)
+
+  // allow either string id or ObjectId
+  if (ObjectId.isValid(id)) {
+    return db.collection(COLLECTION).findOne({ _id: new ObjectId(id) });
+  }
+
+  // fallback (in case you ever stored string ids)
   return db.collection(COLLECTION).findOne({ _id: id });
 }
 

@@ -1,5 +1,4 @@
 // FILE: src/routes/drinks.routes.js
-
 const { Router } = require("express");
 const {
   getAllDrinks,
@@ -33,6 +32,7 @@ router.get("/:id", getDrinkById);
  * POST /drinks
  * @summary Create a new drink log (requires login)
  * @tags Drinks
+ * @security cookieAuth
  * @param {object} request.body.required - Drink to create
  * @example request.body
  * {
@@ -52,6 +52,7 @@ router.post("/", requireAuth, validateDrink, createDrink);
  * PUT /drinks/{id}
  * @summary Update a drink log by ID (requires login)
  * @tags Drinks
+ * @security cookieAuth
  * @param {string} id.path.required - Drink ID
  * @param {object} request.body.required - Updated drink
  * @example request.body
@@ -72,6 +73,7 @@ router.put("/:id", requireAuth, validateDrink, updateDrink);
  * DELETE /drinks/{id}
  * @summary Delete a drink log by ID (requires login)
  * @tags Drinks
+ * @security cookieAuth
  * @param {string} id.path.required - Drink ID
  */
 router.delete("/:id", requireAuth, deleteDrink);

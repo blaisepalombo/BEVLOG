@@ -1,7 +1,10 @@
 function requireAuth(req, res, next) {
-  if (req.isAuthenticated && req.isAuthenticated()) return next();
-
-  return res.status(401).json({ error: "Unauthorized. Please log in." });
+  try {
+    if (req.isAuthenticated && req.isAuthenticated()) return next();
+    return res.status(401).json({ message: "Unauthorized. Please log in." });
+  } catch (err) {
+    return res.status(500).json({ message: "Auth middleware error." });
+  }
 }
 
 module.exports = { requireAuth };
