@@ -106,7 +106,7 @@ drinkForm?.addEventListener("submit", async (event) => {
     }
 
     setTimeout(() => {
-      window.location.href = "dashboard.html";
+      window.location.href = "/dashboard";
     }, 700);
   } catch (error) {
     showMessage(error.message || "Failed to save drink.");

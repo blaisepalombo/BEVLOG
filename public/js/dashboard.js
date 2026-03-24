@@ -78,7 +78,7 @@ function createDrinkCard(drink) {
     <p class="muted">Purchased: ${formatDate(drink.purchasedAt)}</p>
 
     <div class="card-actions">
-      <a class="btn btn-secondary" href="form.html?id=${encodeURIComponent(drink._id)}">Edit</a>
+      <a class="btn btn-secondary" href="/form?id=${encodeURIComponent(drink._id)}">Edit</a>
       <button class="btn btn-primary" type="button" data-delete-id="${drink._id}">Delete</button>
     </div>
   `;
@@ -181,7 +181,7 @@ nextPage?.addEventListener("click", async () => {
 
 logoutButton?.addEventListener("click", async () => {
   try {
-    await handleLogout("index.html");
+    await handleLogout("/");
   } catch (error) {
     showMessage("Logout failed.");
   }

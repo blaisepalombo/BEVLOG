@@ -20,7 +20,7 @@ router.get("/google/callback", (req, res, next) => {
     failureRedirect: "/auth/login-failed",
     session: true,
   })(req, res, () => {
-    res.redirect("/");
+    res.redirect("/dashboard");
   });
 });
 

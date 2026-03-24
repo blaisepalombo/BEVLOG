@@ -20,7 +20,7 @@ export async function loadUserStatus(targetElement) {
   }
 }
 
-export async function handleLogout(redirectTo = "index.html") {
+export async function handleLogout(redirectTo = "/") {
   await logoutUser();
   window.location.href = redirectTo;
 }

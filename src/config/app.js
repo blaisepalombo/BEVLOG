@@ -1,7 +1,9 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const session = require("express-session");
-const { MongoStore } = require("connect-mongo");
+const connectMongo = require("connect-mongo");
+const MongoStore = connectMongo.default || connectMongo;
 const passport = require("passport");
 const swaggerUi = require("swagger-ui-express");
 
@@ -17,6 +19,7 @@ function createApp(options = {}) {
 
   const app = express();
   const isRender = !!process.env.RENDER_EXTERNAL_HOSTNAME;
+  const publicPath = path.join(process.cwd(), "public");
 
   app.set("trust proxy", 1);
 
@@ -28,37 +31,38 @@ function createApp(options = {}) {
   );
 
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-if (authMode === "test") {
-  app.use((req, res, next) => {
-    const isAuthenticated = req.headers["x-test-auth"] === "true";
+  if (authMode === "test") {
+    app.use((req, res, next) => {
+      const isAuthenticated = req.headers["x-test-auth"] === "true";
 
-    req.isAuthenticated = () => isAuthenticated;
+      req.isAuthenticated = () => isAuthenticated;
 
-    req.logout = (callback) => {
-      req.user = null;
-      if (typeof callback === "function") callback(null);
-    };
-
-    req.session = {
-      destroy: (callback) => {
+      req.logout = (callback) => {
+        req.user = null;
         if (typeof callback === "function") callback(null);
-      },
-    };
-
-    if (isAuthenticated) {
-      req.user = {
-        id: req.headers["x-test-user-id"] || "user-123",
-        displayName: req.headers["x-test-user-name"] || "Test User",
-        email: req.headers["x-test-user-email"] || "test@example.com",
       };
-    } else {
-      req.user = null;
-    }
 
-    next();
-  });
-} else {
+      req.session = {
+        destroy: (callback) => {
+          if (typeof callback === "function") callback(null);
+        },
+      };
+
+      if (isAuthenticated) {
+        req.user = {
+          id: req.headers["x-test-user-id"] || "user-123",
+          displayName: req.headers["x-test-user-name"] || "Test User",
+          email: req.headers["x-test-user-email"] || "test@example.com",
+        };
+      } else {
+        req.user = null;
+      }
+
+      next();
+    });
+  } else {
     app.use(
       session({
         name: "sid",
@@ -85,8 +89,10 @@ if (authMode === "test") {
     app.use(passport.session());
   }
 
+  app.use(express.static(publicPath));
+
   app.get("/", (req, res) => {
-    res.json({ status: "ok", service: "energy-drink-log-api" });
+    res.sendFile(path.join(publicPath, "index.html"));
   });
 
   app.use("/", router);
@@ -94,6 +100,14 @@ if (authMode === "test") {
   if (enableSwagger && swaggerDocument) {
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   }
+
+  app.get("/dashboard", (req, res) => {
+    res.sendFile(path.join(publicPath, "dashboard.html"));
+  });
+
+  app.get("/form", (req, res) => {
+    res.sendFile(path.join(publicPath, "form.html"));
+  });
 
   app.use((req, res) => {
     res.status(404).json({ error: "Route not found" });

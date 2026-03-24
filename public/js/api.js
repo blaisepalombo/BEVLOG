@@ -1,5 +1,4 @@
-export const API_BASE = ""; // use "" if frontend is served from same origin
-// export const API_BASE = "https://your-render-url.onrender.com";
+export const API_BASE = "";
 
 async function apiFetch(path, options = {}) {
   const response = await fetch(`${API_BASE}${path}`, {

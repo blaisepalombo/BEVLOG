@@ -17,8 +17,8 @@
       </p>
 
       <div class="hero-actions">
-        <a class="btn btn-primary" id="loginLink" href="#">Sign in with Google</a>
-        <a class="btn btn-secondary" href="dashboard.html">Open Dashboard</a>
+        <a class="btn btn-primary" id="loginLink" href="/auth/google">Sign in with Google</a>
+        <a class="btn btn-secondary" href="/dashboard">Open Dashboard</a>
       </div>
 
       <div class="info-panel">
@@ -32,14 +32,5 @@
       </div>
     </section>
   </main>
-
-  <script type="module">
-    import { API_BASE } from "./js/api.js";
-
-    const loginLink = document.querySelector("#loginLink");
-    if (loginLink) {
-      loginLink.href = `${API_BASE}/auth/google`;
-    }
-  </script>
 </body>
 </html>
