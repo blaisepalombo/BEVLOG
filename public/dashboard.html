@@ -17,9 +17,24 @@
     <div class="container header-row">
       <a class="brand" href="/">Energy Drink Tracker</a>
 
-      <nav class="nav-actions">
-        <a class="btn btn-secondary" href="/form" id="addDrinkLink">Add Drink</a>
-        <button class="btn btn-primary" id="logoutButton" type="button">Logout</button>
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobileMenu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav-actions" id="mobileMenu">
+        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/dashboard">Dashboard</a>
+        <a class="nav-link" href="/form">Add Drink</a>
+        <button class="nav-link nav-link-button" id="logoutButton" type="button">Logout</button>
       </nav>
     </div>
   </header>
@@ -56,92 +71,111 @@
       </article>
     </section>
 
-    <section class="panel">
-      <div class="panel-header">
-        <div>
+    <section class="panel collapsible-panel" data-collapsible="filters">
+      <button
+        class="section-toggle"
+        type="button"
+        aria-expanded="true"
+        aria-controls="filtersContent"
+      >
+        <span>
           <p class="eyebrow">Filters</p>
           <h2>Browse Drinks</h2>
-        </div>
+        </span>
+        <span class="section-toggle-icon"></span>
+      </button>
+
+      <div id="filtersContent" class="section-content">
+        <form id="filterForm" class="filter-grid">
+          <div class="field">
+            <label for="brand">Brand</label>
+            <input id="brand" name="brand" type="text" placeholder="Ghost, Monster, C4..." />
+          </div>
+
+          <div class="field">
+            <label for="search">Search</label>
+            <input id="search" name="search" type="text" placeholder="Search by drink or notes..." />
+          </div>
+
+          <div class="field">
+            <label for="minCaffeine">Min Caffeine</label>
+            <input id="minCaffeine" name="minCaffeine" type="number" min="0" />
+          </div>
+
+          <div class="field">
+            <label for="maxCaffeine">Max Caffeine</label>
+            <input id="maxCaffeine" name="maxCaffeine" type="number" min="0" />
+          </div>
+
+          <div class="field">
+            <label for="minRating">Min Rating</label>
+            <input id="minRating" name="minRating" type="number" min="1" max="10" />
+          </div>
+
+          <div class="field">
+            <label for="maxRating">Max Rating</label>
+            <input id="maxRating" name="maxRating" type="number" min="1" max="10" />
+          </div>
+
+          <div class="field">
+            <label for="sort">Sort</label>
+            <select id="sort" name="sort">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="rating_desc">Highest Rating</option>
+              <option value="rating_asc">Lowest Rating</option>
+              <option value="caffeine_desc">Most Caffeine</option>
+              <option value="caffeine_asc">Least Caffeine</option>
+              <option value="brand_asc">Brand A-Z</option>
+              <option value="brand_desc">Brand Z-A</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="limit">Per Page</label>
+            <select id="limit" name="limit">
+              <option value="6">6</option>
+              <option value="9" selected>9</option>
+              <option value="12">12</option>
+            </select>
+          </div>
+
+          <div class="filter-actions">
+            <button type="submit" class="btn btn-primary">Apply</button>
+            <button type="button" class="btn btn-secondary" id="resetFilters">Reset</button>
+          </div>
+        </form>
       </div>
-
-      <form id="filterForm" class="filter-grid">
-        <div class="field">
-          <label for="brand">Brand</label>
-          <input id="brand" name="brand" type="text" placeholder="Ghost, Monster, C4..." />
-        </div>
-
-        <div class="field">
-          <label for="search">Search</label>
-          <input id="search" name="search" type="text" placeholder="Search by drink or notes..." />
-        </div>
-
-        <div class="field">
-          <label for="minCaffeine">Min Caffeine</label>
-          <input id="minCaffeine" name="minCaffeine" type="number" min="0" />
-        </div>
-
-        <div class="field">
-          <label for="maxCaffeine">Max Caffeine</label>
-          <input id="maxCaffeine" name="maxCaffeine" type="number" min="0" />
-        </div>
-
-        <div class="field">
-          <label for="minRating">Min Rating</label>
-          <input id="minRating" name="minRating" type="number" min="1" max="10" />
-        </div>
-
-        <div class="field">
-          <label for="maxRating">Max Rating</label>
-          <input id="maxRating" name="maxRating" type="number" min="1" max="10" />
-        </div>
-
-        <div class="field">
-          <label for="sort">Sort</label>
-          <select id="sort" name="sort">
-            <option value="newest">Newest</option>
-            <option value="oldest">Oldest</option>
-            <option value="rating_desc">Highest Rating</option>
-            <option value="rating_asc">Lowest Rating</option>
-            <option value="caffeine_desc">Most Caffeine</option>
-            <option value="caffeine_asc">Least Caffeine</option>
-            <option value="brand_asc">Brand A-Z</option>
-            <option value="brand_desc">Brand Z-A</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="limit">Per Page</label>
-          <select id="limit" name="limit">
-            <option value="6">6</option>
-            <option value="9" selected>9</option>
-            <option value="12">12</option>
-          </select>
-        </div>
-
-        <div class="filter-actions">
-          <button type="submit" class="btn btn-primary">Apply</button>
-          <button type="button" class="btn btn-secondary" id="resetFilters">Reset</button>
-        </div>
-      </form>
     </section>
 
-    <section class="panel">
-      <div class="panel-header">
-        <div>
+    <section class="panel collapsible-panel" data-collapsible="results">
+      <button
+        class="section-toggle"
+        type="button"
+        aria-expanded="true"
+        aria-controls="resultsContent"
+      >
+        <span>
           <p class="eyebrow">Results</p>
           <h2>Drink Entries</h2>
+        </span>
+        <span class="section-toggle-icon"></span>
+      </button>
+
+      <div id="resultsContent" class="section-content">
+        <div class="panel-header panel-header-inside">
+          <p id="resultsMeta" class="muted"></p>
         </div>
-        <p id="resultsMeta" class="muted"></p>
-      </div>
 
-      <p id="messageBox" class="message" hidden></p>
+        <p id="messageBox" class="message" hidden></p>
 
-      <div id="drinksGrid" class="card-grid"></div>
+        <div id="drinksGrid" class="card-grid"></div>
 
-      <div class="pagination-row">
-        <button class="btn btn-secondary" id="prevPage" type="button">Previous</button>
-        <span id="pageLabel" class="muted">Page 1</span>
-        <button class="btn btn-secondary" id="nextPage" type="button">Next</button>
+        <div class="pagination-row">
+          <button class="btn btn-secondary" id="prevPage" type="button">Previous</button>
+          <span id="pageLabel" class="muted">Page 1</span>
+          <button class="btn btn-secondary" id="nextPage" type="button">Next</button>
+        </div>
       </div>
     </section>
   </main>
@@ -157,6 +191,8 @@
     </div>
   </div>
 
+  <script src="/js/site-menu.js"></script>
+  <script src="/js/collapsible-sections.js"></script>
   <script type="module" src="/js/dashboard.js"></script>
 </body>
 </html>

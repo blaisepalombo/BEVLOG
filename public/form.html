@@ -4,14 +4,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add Drink | Energy Drink Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bungee&family=Rajdhani:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
   <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="container header-row">
-      <a class="brand" href="/dashboard">Energy Drink Tracker</a>
-      <nav class="nav-actions">
-        <a class="btn btn-secondary" href="/dashboard">Back to Dashboard</a>
+      <a class="brand" href="/">Energy Drink Tracker</a>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobileMenu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav-actions" id="mobileMenu">
+        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/dashboard">Dashboard</a>
+        <a class="nav-link" href="/form">Add Drink</a>
+        <button class="nav-link nav-link-button" id="logoutButton" type="button">Logout</button>
       </nav>
     </div>
   </header>
@@ -19,7 +42,7 @@
   <main class="container page-content">
     <section class="panel form-panel">
       <p class="eyebrow">Drink Form</p>
-      <h1 id="formTitle">Add Drink</h1>
+      <h1 class="page-title" id="formTitle">Add Drink</h1>
       <p class="muted" id="formSubtitle">Create a new drink entry.</p>
 
       <p id="formMessage" class="message" hidden></p>
@@ -73,6 +96,7 @@
     </section>
   </main>
 
+  <script src="/js/site-menu.js"></script>
   <script type="module" src="/js/form.js"></script>
 </body>
 </html>

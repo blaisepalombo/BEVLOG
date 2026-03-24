@@ -227,6 +227,7 @@ loginPopup?.addEventListener("click", (event) => {
 });
 
 async function init() {
+
   const user = await loadUserStatus(authStatus);
   isLoggedIn = Boolean(user);
   closePopup();
@@ -234,4 +235,3 @@ async function init() {
 }
 
 await init();
-

@@ -5,8 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Energy Drink Tracker</title>
   <link rel="stylesheet" href="css/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bungee&family=Rajdhani:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
 </head>
 <body>
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" href="/">Energy Drink Tracker</a>
+
+      <button
+        class="menu-toggle"
+        id="menuToggle"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobileMenu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="nav-actions" id="mobileMenu">
+        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/dashboard">Dashboard</a>
+        <a class="nav-link" href="/form">Add Drink</a>
+        <button class="nav-link nav-link-button" id="logoutButton" type="button">Logout</button>
+      </nav>
+    </div>
+  </header>
+
   <main class="page-shell">
     <section class="hero-card">
       <p class="eyebrow">Frontend for the Energy Drink API</p>
@@ -17,7 +49,7 @@
       </p>
 
       <div class="hero-actions">
-        <a class="btn btn-primary" id="loginLink" href="/auth/google">Sign in with Google</a>
+        <a class="btn btn-primary" href="/auth/google">Sign in with Google</a>
         <a class="btn btn-secondary" href="/dashboard">Open Dashboard</a>
       </div>
 
@@ -32,5 +64,7 @@
       </div>
     </section>
   </main>
+
+  <script src="/js/site-menu.js"></script>
 </body>
 </html>
