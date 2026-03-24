@@ -13,7 +13,7 @@ export async function loadUserStatus(targetElement) {
     return data.user;
   } catch (error) {
     if (targetElement) {
-      targetElement.innerHTML = `You are not logged in. <a href="${API_BASE}/auth/google">Sign in with Google</a>`;
+      targetElement.innerHTML = `You are not logged in. <a href="${API_BASE}/auth/google">Sign in with Google to add new drinks.</a>`;
     }
 
     return null;
