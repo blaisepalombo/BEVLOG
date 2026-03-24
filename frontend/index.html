@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Energy Drink Tracker</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main class="page-shell">
+    <section class="hero-card">
+      <p class="eyebrow">Frontend for the Energy Drink API</p>
+      <h1>Energy Drink Tracker</h1>
+      <p class="hero-text">
+        A simple frontend built to work with a custom Node, Express, and MongoDB API.
+        Log drinks, review entries, and manage your data through a cleaner interface.
+      </p>
+
+      <div class="hero-actions">
+        <a class="btn btn-primary" id="loginLink" href="#">Sign in with Google</a>
+        <a class="btn btn-secondary" href="dashboard.html">Open Dashboard</a>
+      </div>
+
+      <div class="info-panel">
+        <h2>What this frontend does</h2>
+        <ul>
+          <li>Shows your logged-in user status</li>
+          <li>Displays drink entries from the API</li>
+          <li>Lets you add, edit, and delete drinks</li>
+          <li>Uses filtering, sorting, and stats endpoints</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { API_BASE } from "./js/api.js";
+
+    const loginLink = document.querySelector("#loginLink");
+    if (loginLink) {
+      loginLink.href = `${API_BASE}/auth/google`;
+    }
+  </script>
+</body>
+</html>

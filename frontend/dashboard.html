@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | Energy Drink Tracker</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="brand" href="index.html">Energy Drink Tracker</a>
+
+      <nav class="nav-actions">
+        <a class="btn btn-secondary" href="form.html">Add Drink</a>
+        <button class="btn btn-primary" id="logoutButton" type="button">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page-content">
+    <section class="top-grid">
+      <article class="panel">
+        <p class="eyebrow">Account</p>
+        <h1>Dashboard</h1>
+        <p id="authStatus" class="muted">Checking login status...</p>
+      </article>
+
+      <article class="panel">
+        <p class="eyebrow">Stats</p>
+        <h2>Quick Overview</h2>
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card">
+            <span class="stat-label">Total Drinks</span>
+            <strong id="statTotal">--</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Avg. Caffeine</span>
+            <strong id="statCaffeine">--</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Avg. Rating</span>
+            <strong id="statRating">--</strong>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Top Brand</span>
+            <strong id="statBrand">--</strong>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Filters</p>
+          <h2>Browse Drinks</h2>
+        </div>
+      </div>
+
+      <form id="filterForm" class="filter-grid">
+        <div class="field">
+          <label for="brand">Brand</label>
+          <input id="brand" name="brand" type="text" placeholder="Ghost, Monster, C4..." />
+        </div>
+
+        <div class="field">
+          <label for="search">Search</label>
+          <input id="search" name="search" type="text" placeholder="Search by drink or notes..." />
+        </div>
+
+        <div class="field">
+          <label for="minCaffeine">Min Caffeine</label>
+          <input id="minCaffeine" name="minCaffeine" type="number" min="0" />
+        </div>
+
+        <div class="field">
+          <label for="maxCaffeine">Max Caffeine</label>
+          <input id="maxCaffeine" name="maxCaffeine" type="number" min="0" />
+        </div>
+
+        <div class="field">
+          <label for="minRating">Min Rating</label>
+          <input id="minRating" name="minRating" type="number" min="1" max="10" />
+        </div>
+
+        <div class="field">
+          <label for="maxRating">Max Rating</label>
+          <input id="maxRating" name="maxRating" type="number" min="1" max="10" />
+        </div>
+
+        <div class="field">
+          <label for="sort">Sort</label>
+          <select id="sort" name="sort">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="rating_desc">Highest Rating</option>
+            <option value="rating_asc">Lowest Rating</option>
+            <option value="caffeine_desc">Most Caffeine</option>
+            <option value="caffeine_asc">Least Caffeine</option>
+            <option value="brand_asc">Brand A-Z</option>
+            <option value="brand_desc">Brand Z-A</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="limit">Per Page</label>
+          <select id="limit" name="limit">
+            <option value="6">6</option>
+            <option value="9" selected>9</option>
+            <option value="12">12</option>
+          </select>
+        </div>
+
+        <div class="filter-actions">
+          <button type="submit" class="btn btn-primary">Apply</button>
+          <button type="button" class="btn btn-secondary" id="resetFilters">Reset</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Results</p>
+          <h2>Drink Entries</h2>
+        </div>
+        <p id="resultsMeta" class="muted"></p>
+      </div>
+
+      <p id="messageBox" class="message" hidden></p>
+
+      <div id="drinksGrid" class="card-grid"></div>
+
+      <div class="pagination-row">
+        <button class="btn btn-secondary" id="prevPage" type="button">Previous</button>
+        <span id="pageLabel" class="muted">Page 1</span>
+        <button class="btn btn-secondary" id="nextPage" type="button">Next</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

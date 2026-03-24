@@ -1,7 +1,11 @@
-// FILE: src/controllers/drinks.controller.js
-
-const { ObjectId } = require("mongodb");
 const { getDb } = require("../db/mongodb");
+const {
+  buildDrinkFilter,
+  buildDrinkIdQuery,
+  buildDrinkSort,
+  getPagination,
+} = require("../utils/drinkQueryBuilder");
+const { buildDrinkStatsPipeline } = require("../utils/drinkStats");
 
 const COLLECTION = "drinks";
 
@@ -9,28 +13,56 @@ function nowIso() {
   return new Date().toISOString();
 }
 
-// Match _id whether it's stored as a string OR an ObjectId
-function buildIdQuery(id) {
-  const queries = [{ _id: id }]; // string match
-
-  // ObjectId match (only if valid 24-hex string)
-  if (ObjectId.isValid(id)) {
-    queries.push({ _id: new ObjectId(id) });
+function normalizeOptionalNumber(value) {
+  if (value === undefined || value === null || value === "") {
+    return null;
   }
+  return Number(value);
+}
 
-  return { $or: queries };
+function normalizePurchasedAt(value) {
+  if (value === undefined || value === null || value === "") {
+    return null;
+  }
+  return new Date(value).toISOString();
+}
+
+function buildDrinkPayload(body) {
+  return {
+    brand: body.brand.trim(),
+    drinkName: body.drinkName.trim(),
+    sizeOz: Number(body.sizeOz),
+    caffeineMg: normalizeOptionalNumber(body.caffeineMg),
+    sugarG: normalizeOptionalNumber(body.sugarG),
+    rating: normalizeOptionalNumber(body.rating),
+    notes: typeof body.notes === "string" ? body.notes.trim() : "",
+    purchasedAt: normalizePurchasedAt(body.purchasedAt),
+  };
 }
 
 async function getAllDrinks(req, res) {
   try {
     const db = getDb();
-    const drinks = await db
-      .collection(COLLECTION)
-      .find({})
-      .sort({ createdAt: -1 })
-      .toArray();
+    const filter = buildDrinkFilter(req.query);
+    const sort = buildDrinkSort(req.query.sort);
+    const { page, limit, skip } = getPagination(req.query);
 
-    return res.status(200).json(drinks);
+    const collection = db.collection(COLLECTION);
+
+    const [data, total] = await Promise.all([
+      collection.find(filter).sort(sort).skip(skip).limit(limit).toArray(),
+      collection.countDocuments(filter),
+    ]);
+
+    return res.status(200).json({
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: total === 0 ? 0 : Math.ceil(total / limit),
+      },
+    });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -39,9 +71,7 @@ async function getAllDrinks(req, res) {
 async function getDrinkById(req, res) {
   try {
     const db = getDb();
-    const id = req.params.id;
-
-    const drink = await db.collection(COLLECTION).findOne(buildIdQuery(id));
+    const drink = await db.collection(COLLECTION).findOne(buildDrinkIdQuery(req.params.id));
 
     if (!drink) {
       return res.status(404).json({ error: "Drink not found" });
@@ -56,12 +86,16 @@ async function getDrinkById(req, res) {
 async function createDrink(req, res) {
   try {
     const db = getDb();
+    const timestamp = nowIso();
+    const payload = buildDrinkPayload(req.body);
 
     const doc = {
-      ...req.body,
-      purchasedAt: req.body.purchasedAt ?? null,
-      createdAt: nowIso(),
-      updatedAt: nowIso(),
+      ...payload,
+      createdBy: String(req.user.id),
+      createdByName: req.user.displayName || null,
+      createdByEmail: req.user.email || null,
+      createdAt: timestamp,
+      updatedAt: timestamp,
     };
 
     const result = await db.collection(COLLECTION).insertOne(doc);
@@ -74,45 +108,66 @@ async function createDrink(req, res) {
 async function updateDrink(req, res) {
   try {
     const db = getDb();
-    const id = req.params.id;
-
-    const updateDoc = {
-      ...req.body,
-      purchasedAt: req.body.purchasedAt ?? null,
-      updatedAt: nowIso(),
-    };
+    const payload = buildDrinkPayload(req.body);
 
     const result = await db.collection(COLLECTION).updateOne(
-      buildIdQuery(id),
-      { $set: updateDoc }
+      buildDrinkIdQuery(req.params.id),
+      {
+        $set: {
+          ...payload,
+          updatedAt: nowIso(),
+        },
+      }
     );
 
-    // If nothing matched, it truly doesn't exist
     if (result.matchedCount === 0) {
       return res.status(404).json({ error: "Drink not found" });
     }
 
-    // RUBRIC: PUT returns 204
     return res.status(204).send();
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
 }
 
-
 async function deleteDrink(req, res) {
   try {
     const db = getDb();
-    const id = req.params.id;
-
-    const result = await db.collection(COLLECTION).deleteOne(buildIdQuery(id));
+    const result = await db.collection(COLLECTION).deleteOne(buildDrinkIdQuery(req.params.id));
 
     if (result.deletedCount === 0) {
       return res.status(404).json({ error: "Drink not found" });
     }
 
-    // RUBRIC: DELETE returns 200
     return res.status(200).json({ message: "Drink deleted" });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
+
+async function getDrinkStats(req, res) {
+  try {
+    const db = getDb();
+    const filter = buildDrinkFilter(req.query);
+
+    const [stats] = await db
+      .collection(COLLECTION)
+      .aggregate(buildDrinkStatsPipeline(filter))
+      .toArray();
+
+    const overview = stats?.overview?.[0] || {
+      totalDrinks: 0,
+      averageCaffeineMg: null,
+      averageSugarG: null,
+      averageRating: null,
+      newestEntryAt: null,
+    };
+
+    return res.status(200).json({
+      overview,
+      topBrands: stats?.topBrands || [],
+      topRated: stats?.topRated || [],
+    });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
@@ -124,4 +179,5 @@ module.exports = {
   createDrink,
   updateDrink,
   deleteDrink,
+  getDrinkStats,
 };

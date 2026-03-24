@@ -1,79 +1,76 @@
-// src/routes/auth.routes.js
 const { Router } = require("express");
 const passport = require("passport");
 
 const router = Router();
 
-/**
- * GET /auth/google
- * @summary Login with Google
- * @tags Auth
- */
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+router.get("/google", (req, res, next) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'Start Google OAuth login'
+  // #swagger.description = 'Redirects the user to Google to begin the OAuth login flow.'
+  return passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })(req, res, next);
+});
 
-/**
- * GET /auth/google/callback
- * @summary Google OAuth callback
- * @tags Auth
- */
-router.get(
-  "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/auth/failed" }),
-  (req, res) => {
-    res.redirect("/auth/success");
-  }
-);
+router.get("/google/callback", (req, res, next) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'Google OAuth callback'
+  // #swagger.description = 'Handles the Google OAuth callback and establishes the user session.'
+  return passport.authenticate("google", {
+    failureRedirect: "/auth/login-failed",
+    session: true,
+  })(req, res, () => {
+    res.redirect("/");
+  });
+});
 
-/**
- * GET /auth/me
- * @summary Get current logged-in user
- * @tags Auth
- */
 router.get("/me", (req, res) => {
-  if (req.isAuthenticated && req.isAuthenticated()) {
-    return res.status(200).json({ user: req.user });
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'Get current authenticated user'
+  // #swagger.description = 'Returns the currently logged-in user if a valid session exists.'
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    return res.status(401).json({ user: null, message: "Not authenticated" });
   }
-  return res.status(401).json({ message: "Not logged in", user: null });
-});
 
-/**
- * POST /auth/logout
- * @summary Logout
- * @tags Auth
- */
-router.post("/logout", (req, res, next) => {
-  req.logout((err) => {
-    if (err) return next(err);
-
-    req.session?.destroy((destroyErr) => {
-      if (destroyErr) return next(destroyErr);
-
-      res.clearCookie("sid"); // matches server.js session cookie name
-      return res.status(200).json({ message: "Logged out" });
-    });
+  return res.status(200).json({
+    user: {
+      id: req.user.id,
+      displayName: req.user.displayName || null,
+      email: req.user.email || null,
+    },
   });
 });
 
-// Optional GET logout for browser testing
-router.get("/logout", (req, res, next) => {
-  req.logout((err) => {
-    if (err) return next(err);
+router.post("/logout", (req, res) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'Log out current user'
+  // #swagger.description = 'Ends the current session and clears the session cookie.'
+  req.logout((logoutErr) => {
+    if (logoutErr) {
+      return res.status(500).json({ error: "Logout failed" });
+    }
 
-    req.session?.destroy((destroyErr) => {
-      if (destroyErr) return next(destroyErr);
+    if (req.session && typeof req.session.destroy === "function") {
+      return req.session.destroy((sessionErr) => {
+        if (sessionErr) {
+          return res.status(500).json({ error: "Session destroy failed" });
+        }
 
-      res.clearCookie("sid");
-      return res.status(200).send("Logged out. You can close this tab.");
-    });
+        res.clearCookie("sid");
+        return res.status(200).json({ message: "Logged out successfully" });
+      });
+    }
+
+    res.clearCookie("sid");
+    return res.status(200).json({ message: "Logged out successfully" });
   });
 });
 
-router.get("/success", (req, res) => {
-  res.status(200).send("Login successful. You can close this tab and use the API.");
-});
-
-router.get("/failed", (req, res) => {
-  res.status(401).send("Login failed.");
+router.get("/login-failed", (req, res) => {
+  // #swagger.tags = ['Auth']
+  // #swagger.summary = 'OAuth login failed'
+  // #swagger.description = 'Returned when Google OAuth authentication fails.'
+  return res.status(401).json({ error: "Google authentication failed" });
 });
 
 module.exports = router;

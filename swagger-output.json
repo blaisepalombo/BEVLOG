@@ -2,11 +2,21 @@
   "swagger": "2.0",
   "info": {
     "title": "Energy Drink Log API",
-    "description": "CRUD API for logging energy drinks. Write routes require Google login via /auth/google.",
-    "version": "1.0.0"
+    "description": "REST API for tracking energy drinks with MongoDB, Google OAuth, filtering, pagination, stats, and full CRUD operations.",
+    "version": "1.1.0"
   },
   "host": "localhost:3000",
   "basePath": "/",
+  "tags": [
+    {
+      "name": "Drinks",
+      "description": "Energy drink logging endpoints"
+    },
+    {
+      "name": "Auth",
+      "description": "Google OAuth and session endpoints"
+    }
+  ],
   "schemes": [
     "http"
   ],
@@ -21,10 +31,70 @@
   "paths": {
     "/drinks/": {
       "get": {
-        "description": "",
+        "tags": [
+          "Drinks"
+        ],
+        "summary": "Get drink logs with filtering, sorting, and pagination",
+        "description": "Returns drink entries with optional filtering by brand, search term, caffeine range, rating range, sorting, and pagination.",
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "brand",
+            "in": "query",
+            "description": "Filter by brand name",
+            "type": "string"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search by brand, drink name, or notes",
+            "type": "string"
+          },
+          {
+            "name": "minCaffeine",
+            "in": "query",
+            "description": "Minimum caffeine in mg",
+            "type": "number"
+          },
+          {
+            "name": "maxCaffeine",
+            "in": "query",
+            "description": "Maximum caffeine in mg",
+            "type": "number"
+          },
+          {
+            "name": "minRating",
+            "in": "query",
+            "description": "Minimum rating",
+            "type": "number"
+          },
+          {
+            "name": "maxRating",
+            "in": "query",
+            "description": "Maximum rating",
+            "type": "number"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "500": {
             "description": "Internal Server Error"
@@ -32,37 +102,143 @@
         }
       },
       "post": {
-        "description": "",
+        "tags": [
+          "Drinks"
+        ],
+        "summary": "Create a new drink log",
+        "description": "Requires login. Creates a new drink entry associated with the authenticated user.",
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "description": "Drink to create",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "brand": {
-                  "example": "any"
+                "type": {
+                  "type": "string",
+                  "example": "object"
                 },
-                "drinkName": {
-                  "example": "any"
+                "required": {
+                  "type": "array",
+                  "example": [
+                    "brand",
+                    "drinkName",
+                    "sizeOz"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
                 },
-                "sizeOz": {
-                  "example": "any"
-                },
-                "caffeineMg": {
-                  "example": "any"
-                },
-                "sugarG": {
-                  "example": "any"
-                },
-                "rating": {
-                  "example": "any"
-                },
-                "notes": {
-                  "example": "any"
-                },
-                "purchasedAt": {
-                  "example": "any"
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "brand": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Ghost"
+                        }
+                      }
+                    },
+                    "drinkName": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Blue Raspberry"
+                        }
+                      }
+                    },
+                    "sizeOz": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        },
+                        "example": {
+                          "type": "number",
+                          "example": 16
+                        }
+                      }
+                    },
+                    "caffeineMg": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        },
+                        "example": {
+                          "type": "number",
+                          "example": 200
+                        }
+                      }
+                    },
+                    "sugarG": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        },
+                        "example": {
+                          "type": "number",
+                          "example": 0
+                        }
+                      }
+                    },
+                    "rating": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        },
+                        "example": {
+                          "type": "number",
+                          "example": 8
+                        }
+                      }
+                    },
+                    "notes": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Testing the upgraded API"
+                        }
+                      }
+                    },
+                    "purchasedAt": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "2026-03-24T18:00:00.000Z"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -81,18 +257,101 @@
           "500": {
             "description": "Internal Server Error"
           }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
+      }
+    },
+    "/drinks/stats": {
+      "get": {
+        "tags": [
+          "Drinks"
+        ],
+        "summary": "Get aggregated drink stats",
+        "description": "Returns overall drink statistics, top brands, and top rated entries.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "brand",
+            "in": "query",
+            "description": "Filter stats by brand name",
+            "type": "string"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search by brand, drink name, or notes",
+            "type": "string"
+          },
+          {
+            "name": "minCaffeine",
+            "in": "query",
+            "description": "Minimum caffeine in mg",
+            "type": "number"
+          },
+          {
+            "name": "maxCaffeine",
+            "in": "query",
+            "description": "Maximum caffeine in mg",
+            "type": "number"
+          },
+          {
+            "name": "minRating",
+            "in": "query",
+            "description": "Minimum rating",
+            "type": "number"
+          },
+          {
+            "name": "maxRating",
+            "in": "query",
+            "description": "Maximum rating",
+            "type": "number"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
         }
       }
     },
     "/drinks/{id}": {
       "get": {
+        "tags": [
+          "Drinks"
+        ],
+        "summary": "Get a drink log by ID",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Drink ID"
           }
         ],
         "responses": {
@@ -108,43 +367,150 @@
         }
       },
       "put": {
-        "description": "",
+        "tags": [
+          "Drinks"
+        ],
+        "summary": "Update a drink log by ID",
+        "description": "Requires login and ownership. Only the user who created the entry can update it.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Drink ID"
           },
           {
             "name": "body",
             "in": "body",
+            "description": "Updated drink data",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "brand": {
-                  "example": "any"
+                "type": {
+                  "type": "string",
+                  "example": "object"
                 },
-                "drinkName": {
-                  "example": "any"
+                "required": {
+                  "type": "array",
+                  "example": [
+                    "brand",
+                    "drinkName",
+                    "sizeOz"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
                 },
-                "sizeOz": {
-                  "example": "any"
-                },
-                "caffeineMg": {
-                  "example": "any"
-                },
-                "sugarG": {
-                  "example": "any"
-                },
-                "rating": {
-                  "example": "any"
-                },
-                "notes": {
-                  "example": "any"
-                },
-                "purchasedAt": {
-                  "example": "any"
+                "properties": {
+                  "type": "object",
+                  "properties": {
+                    "brand": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Ghost"
+                        }
+                      }
+                    },
+                    "drinkName": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Blue Raspberry"
+                        }
+                      }
+                    },
+                    "sizeOz": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        },
+                        "example": {
+                          "type": "number",
+                          "example": 16
+                        }
+                      }
+                    },
+                    "caffeineMg": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        },
+                        "example": {
+                          "type": "number",
+                          "example": 200
+                        }
+                      }
+                    },
+                    "sugarG": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        },
+                        "example": {
+                          "type": "number",
+                          "example": 0
+                        }
+                      }
+                    },
+                    "rating": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "number"
+                        },
+                        "example": {
+                          "type": "number",
+                          "example": 9
+                        }
+                      }
+                    },
+                    "notes": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "Updated review after trying it again"
+                        }
+                      }
+                    },
+                    "purchasedAt": {
+                      "type": "object",
+                      "properties": {
+                        "type": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "example": {
+                          "type": "string",
+                          "example": "2026-03-24T18:00:00.000Z"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -160,22 +526,35 @@
           "401": {
             "description": "Unauthorized"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
       },
       "delete": {
-        "description": "",
+        "tags": [
+          "Drinks"
+        ],
+        "summary": "Delete a drink log by ID",
+        "description": "Requires login and ownership. Only the user who created the entry can delete it.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "string",
+            "description": "Drink ID"
           }
         ],
         "responses": {
@@ -185,18 +564,30 @@
           "401": {
             "description": "Unauthorized"
           },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ]
       }
     },
     "/auth/google": {
       "get": {
-        "description": "",
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Start Google OAuth login",
+        "description": "Redirects the user to Google to begin the OAuth login flow.",
         "responses": {
           "default": {
             "description": ""
@@ -206,7 +597,11 @@
     },
     "/auth/google/callback": {
       "get": {
-        "description": "",
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Google OAuth callback",
+        "description": "Handles the Google OAuth callback and establishes the user session.",
         "responses": {
           "default": {
             "description": ""
@@ -216,7 +611,11 @@
     },
     "/auth/me": {
       "get": {
-        "description": "",
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Get current authenticated user",
+        "description": "Returns the currently logged-in user if a valid session exists.",
         "responses": {
           "200": {
             "description": "OK"
@@ -229,35 +628,28 @@
     },
     "/auth/logout": {
       "post": {
-        "description": "",
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Log out current user",
+        "description": "Ends the current session and clears the session cookie.",
         "responses": {
           "200": {
             "description": "OK"
-          }
-        }
-      },
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/auth/success": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
     },
-    "/auth/failed": {
+    "/auth/login-failed": {
       "get": {
-        "description": "",
+        "tags": [
+          "Auth"
+        ],
+        "summary": "OAuth login failed",
+        "description": "Returned when Google OAuth authentication fails.",
         "responses": {
           "401": {
             "description": "Unauthorized"

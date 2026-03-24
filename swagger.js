@@ -1,4 +1,3 @@
-// swagger.js
 const swaggerAutogen = require("swagger-autogen")();
 
 const isRender = !!process.env.RENDER_EXTERNAL_HOSTNAME;
@@ -7,15 +6,17 @@ const doc = {
   info: {
     title: "Energy Drink Log API",
     description:
-      "CRUD API for logging energy drinks. Write routes require Google login via /auth/google.",
-    version: "1.0.0",
+      "REST API for tracking energy drinks with MongoDB, Google OAuth, filtering, pagination, stats, and full CRUD operations.",
+    version: "1.1.0",
   },
   host: isRender
     ? process.env.RENDER_EXTERNAL_HOSTNAME
     : `localhost:${process.env.PORT || 3000}`,
   schemes: isRender ? ["https"] : ["http"],
-
-  // Swagger 2.0 security definitions
+  tags: [
+    { name: "Drinks", description: "Energy drink logging endpoints" },
+    { name: "Auth", description: "Google OAuth and session endpoints" },
+  ],
   securityDefinitions: {
     cookieAuth: {
       type: "apiKey",
