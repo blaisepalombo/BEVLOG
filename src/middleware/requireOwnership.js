@@ -6,14 +6,15 @@ const COLLECTION = "drinks";
 async function requireOwnership(req, res, next) {
   try {
     const db = getDb();
-    const drink = await db.collection(COLLECTION).findOne(buildDrinkIdQuery(req.params.id));
+    const drink = await db.collection(COLLECTION).findOne({
+      $and: [
+        buildDrinkIdQuery(req.params.id),
+        { userId: String(req.user.id) },
+      ],
+    });
 
     if (!drink) {
       return res.status(404).json({ error: "Drink not found" });
-    }
-
-    if (!drink.createdBy || String(drink.createdBy) !== String(req.user.id)) {
-      return res.status(403).json({ error: "You do not have permission to modify this drink" });
     }
 
     req.drink = drink;

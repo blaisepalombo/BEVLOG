@@ -90,19 +90,31 @@
 
 .hero-auth-area {
   display: flex;
-  align-items: center;
+  align-items: stretch;
+}
+
+.hero-auth-area .btn,
+.hero-auth-area .hero-welcome {
+  min-width: 220px;
 }
 
 .hero-welcome {
   margin: 0;
   padding: 0.82rem 1rem;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), #d88769);
+  border: 1px solid rgba(197, 111, 80, 0.3);
   color: white;
   font-weight: 700;
   min-height: 44px;
   align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.hero-welcome:not([hidden]) {
+  display: inline-flex;
 }
 
 .hero-welcome:not([hidden]) {

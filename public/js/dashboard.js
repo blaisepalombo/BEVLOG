@@ -129,13 +129,13 @@ async function loadDashboard() {
     const total = pagination.total ?? 0;
     const totalPages = pagination.totalPages ?? 1;
 
-    resultsMeta.textContent = `${total} result${total === 1 ? "" : "s"} found`;
+    resultsMeta.textContent = `${total} personal result${total === 1 ? "" : "s"} found`;
     pageLabel.textContent = `Page ${pagination.page || 1} of ${totalPages || 1}`;
     prevPage.disabled = (pagination.page || 1) <= 1;
     nextPage.disabled = (pagination.page || 1) >= (totalPages || 1);
 
     if (drinks.length === 0) {
-      drinksGrid.innerHTML = `<p class="muted">No drinks found for the current filters.</p>`;
+      drinksGrid.innerHTML = `<p class="muted">No drinks found in your tracker for the current filters.</p>`;
     } else {
       drinks.forEach((drink) => {
         drinksGrid.appendChild(createDrinkCard(drink));

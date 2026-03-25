@@ -40,10 +40,26 @@ function buildDrinkPayload(body) {
   };
 }
 
+function buildOwnedDrinkFilter(req) {
+  return {
+    ...buildDrinkFilter(req.query),
+    userId: String(req.user.id),
+  };
+}
+
+function buildOwnedDrinkIdQuery(req) {
+  return {
+    $and: [
+      buildDrinkIdQuery(req.params.id),
+      { userId: String(req.user.id) },
+    ],
+  };
+}
+
 async function getAllDrinks(req, res) {
   try {
     const db = getDb();
-    const filter = buildDrinkFilter(req.query);
+    const filter = buildOwnedDrinkFilter(req);
     const sort = buildDrinkSort(req.query.sort);
     const { page, limit, skip } = getPagination(req.query);
 
@@ -71,7 +87,7 @@ async function getAllDrinks(req, res) {
 async function getDrinkById(req, res) {
   try {
     const db = getDb();
-    const drink = await db.collection(COLLECTION).findOne(buildDrinkIdQuery(req.params.id));
+    const drink = await db.collection(COLLECTION).findOne(buildOwnedDrinkIdQuery(req));
 
     if (!drink) {
       return res.status(404).json({ error: "Drink not found" });
@@ -91,9 +107,9 @@ async function createDrink(req, res) {
 
     const doc = {
       ...payload,
-      createdBy: String(req.user.id),
-      createdByName: req.user.displayName || null,
-      createdByEmail: req.user.email || null,
+      userId: String(req.user.id),
+      userDisplayName: req.user.displayName || null,
+      userEmail: req.user.email || null,
       createdAt: timestamp,
       updatedAt: timestamp,
     };
@@ -111,7 +127,7 @@ async function updateDrink(req, res) {
     const payload = buildDrinkPayload(req.body);
 
     const result = await db.collection(COLLECTION).updateOne(
-      buildDrinkIdQuery(req.params.id),
+      buildOwnedDrinkIdQuery(req),
       {
         $set: {
           ...payload,
@@ -133,7 +149,7 @@ async function updateDrink(req, res) {
 async function deleteDrink(req, res) {
   try {
     const db = getDb();
-    const result = await db.collection(COLLECTION).deleteOne(buildDrinkIdQuery(req.params.id));
+    const result = await db.collection(COLLECTION).deleteOne(buildOwnedDrinkIdQuery(req));
 
     if (result.deletedCount === 0) {
       return res.status(404).json({ error: "Drink not found" });
@@ -148,7 +164,7 @@ async function deleteDrink(req, res) {
 async function getDrinkStats(req, res) {
   try {
     const db = getDb();
-    const filter = buildDrinkFilter(req.query);
+    const filter = buildOwnedDrinkFilter(req);
 
     const [stats] = await db
       .collection(COLLECTION)

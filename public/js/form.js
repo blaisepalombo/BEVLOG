@@ -1,120 +1,178 @@
-import { getDrinkById, createDrink, updateDrink } from "./api.js";
+import { getDrinks, getDrinkStats, deleteDrink } from "./api.js";
 import { loadUserStatus } from "./auth.js";
 
-const drinkForm = document.querySelector("#drinkForm");
-const formTitle = document.querySelector("#formTitle");
-const formSubtitle = document.querySelector("#formSubtitle");
-const formMessage = document.querySelector("#formMessage");
-const submitButton = document.querySelector("#submitButton");
+const authStatus = document.querySelector("#authStatus");
+const filterForm = document.querySelector("#filterForm");
+const resetFiltersButton = document.querySelector("#resetFilters");
+const drinksGrid = document.querySelector("#drinksGrid");
+const messageBox = document.querySelector("#messageBox");
+const resultsMeta = document.querySelector("#resultsMeta");
+const pageLabel = document.querySelector("#pageLabel");
+const prevPage = document.querySelector("#prevPage");
+const nextPage = document.querySelector("#nextPage");
 
-const params = new URLSearchParams(window.location.search);
-const drinkId = params.get("id");
+const statTotal = document.querySelector("#statTotal");
+const statCaffeine = document.querySelector("#statCaffeine");
+const statRating = document.querySelector("#statRating");
+const statBrand = document.querySelector("#statBrand");
+
+let currentPage = 1;
 
 function showMessage(message, type = "error") {
-  formMessage.textContent = message;
-  formMessage.className = `message ${type}`;
-  formMessage.hidden = false;
+  messageBox.textContent = message;
+  messageBox.className = `message ${type}`;
+  messageBox.hidden = false;
 }
 
 function clearMessage() {
-  formMessage.hidden = true;
-  formMessage.textContent = "";
-  formMessage.className = "message";
+  messageBox.hidden = true;
+  messageBox.textContent = "";
+  messageBox.className = "message";
 }
 
-function isoToLocalDateTime(isoString) {
-  if (!isoString) return "";
-  const date = new Date(isoString);
-  if (Number.isNaN(date.getTime())) return "";
-  const offset = date.getTimezoneOffset();
-  const local = new Date(date.getTime() - offset * 60000);
-  return local.toISOString().slice(0, 16);
+function formatDate(value) {
+  if (!value) return "No purchase date";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "No purchase date";
+  return date.toLocaleString();
 }
 
-function localDateTimeToIso(value) {
-  if (!value) return null;
-  return new Date(value).toISOString();
+function setStats(stats) {
+  const overview = stats?.overview || {};
+  const topBrand = stats?.topBrands?.[0]?.brand || "--";
+
+  statTotal.textContent = overview.totalDrinks ?? 0;
+  statCaffeine.textContent =
+    overview.averageCaffeineMg != null
+      ? `${Math.round(overview.averageCaffeineMg)} mg`
+      : "--";
+  statRating.textContent =
+    overview.averageRating != null
+      ? Number(overview.averageRating).toFixed(1)
+      : "--";
+  statBrand.textContent = topBrand;
 }
 
-function getPayloadFromForm() {
-  const formData = new FormData(drinkForm);
+function createDrinkCard(drink) {
+  const article = document.createElement("article");
+  article.className = "drink-card";
 
-  const payload = {
+  article.innerHTML = `
+    <div>
+      <h3>${drink.brand} - ${drink.drinkName}</h3>
+      <p class="muted">${drink.notes || "No notes added."}</p>
+    </div>
+
+    <div class="drink-meta">
+      <span class="badge">${drink.sizeOz} oz</span>
+      <span class="badge">${drink.caffeineMg ?? 0} mg caffeine</span>
+      <span class="badge">${drink.sugarG ?? 0} g sugar</span>
+      <span class="badge">Rating: ${drink.rating ?? "--"}</span>
+    </div>
+
+    <p class="muted">Purchased: ${formatDate(drink.purchasedAt)}</p>
+
+    <div class="card-actions">
+      <a class="btn btn-secondary" href="/form?id=${encodeURIComponent(drink._id)}">Edit</a>
+      <button class="btn btn-primary" type="button" data-delete-id="${drink._id}">Delete</button>
+    </div>
+  `;
+
+  const deleteButton = article.querySelector("[data-delete-id]");
+  deleteButton.addEventListener("click", async () => {
+    const confirmed = window.confirm("Delete this drink?");
+    if (!confirmed) return;
+
+    try {
+      await deleteDrink(drink._id);
+      showMessage("Drink deleted successfully.", "success");
+      await loadDashboard();
+    } catch (error) {
+      showMessage(error.message || "Failed to delete drink.");
+    }
+  });
+
+  return article;
+}
+
+function getFiltersFromForm() {
+  const formData = new FormData(filterForm);
+
+  return {
     brand: formData.get("brand")?.trim(),
-    drinkName: formData.get("drinkName")?.trim(),
-    sizeOz: Number(formData.get("sizeOz")),
-    notes: formData.get("notes")?.trim() || "",
+    search: formData.get("search")?.trim(),
+    minCaffeine: formData.get("minCaffeine"),
+    maxCaffeine: formData.get("maxCaffeine"),
+    minRating: formData.get("minRating"),
+    maxRating: formData.get("maxRating"),
+    sort: formData.get("sort"),
+    limit: formData.get("limit"),
+    page: currentPage,
   };
-
-  const caffeineMg = formData.get("caffeineMg");
-  const sugarG = formData.get("sugarG");
-  const rating = formData.get("rating");
-  const purchasedAt = formData.get("purchasedAt");
-
-  if (caffeineMg !== "") payload.caffeineMg = Number(caffeineMg);
-  if (sugarG !== "") payload.sugarG = Number(sugarG);
-  if (rating !== "") payload.rating = Number(rating);
-  if (purchasedAt !== "") payload.purchasedAt = localDateTimeToIso(purchasedAt);
-
-  return payload;
 }
 
-function fillForm(drink) {
-  drinkForm.brand.value = drink.brand || "";
-  drinkForm.drinkName.value = drink.drinkName || "";
-  drinkForm.sizeOz.value = drink.sizeOz ?? "";
-  drinkForm.caffeineMg.value = drink.caffeineMg ?? "";
-  drinkForm.sugarG.value = drink.sugarG ?? "";
-  drinkForm.rating.value = drink.rating ?? "";
-  drinkForm.notes.value = drink.notes || "";
-  drinkForm.purchasedAt.value = isoToLocalDateTime(drink.purchasedAt);
-}
-
-async function loadEditMode() {
-  if (!drinkId) return;
-
-  formTitle.textContent = "Edit Drink";
-  formSubtitle.textContent = "Update an existing drink entry.";
-  submitButton.textContent = "Update Drink";
+async function loadDashboard() {
+  clearMessage();
 
   try {
-    const drink = await getDrinkById(drinkId);
-    fillForm(drink);
+    const filters = getFiltersFromForm();
+
+    const [drinkResult, statsResult] = await Promise.all([
+      getDrinks(filters),
+      getDrinkStats(filters),
+    ]);
+
+    drinksGrid.innerHTML = "";
+
+    const drinks = drinkResult.data || [];
+    const pagination = drinkResult.pagination || {};
+    const total = pagination.total ?? 0;
+    const totalPages = pagination.totalPages ?? 1;
+
+    resultsMeta.textContent = `${total} personal result${total === 1 ? "" : "s"} found`;
+    pageLabel.textContent = `Page ${pagination.page || 1} of ${totalPages || 1}`;
+    prevPage.disabled = (pagination.page || 1) <= 1;
+    nextPage.disabled = (pagination.page || 1) >= (totalPages || 1);
+
+    if (drinks.length === 0) {
+      drinksGrid.innerHTML = `<p class="muted">No drinks found in your tracker for the current filters.</p>`;
+    } else {
+      drinks.forEach((drink) => {
+        drinksGrid.appendChild(createDrinkCard(drink));
+      });
+    }
+
+    setStats(statsResult);
   } catch (error) {
-    showMessage(error.message || "Failed to load drink.");
+    showMessage(error.message || "Failed to load drinks.");
   }
 }
 
-drinkForm?.addEventListener("submit", async (event) => {
+filterForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
-  clearMessage();
+  currentPage = 1;
+  await loadDashboard();
+});
 
-  const originalText = submitButton.textContent;
-  submitButton.disabled = true;
-  submitButton.textContent = drinkId ? "Updating..." : "Saving...";
+resetFiltersButton?.addEventListener("click", async () => {
+  filterForm.reset();
+  filterForm.querySelector("#sort").value = "newest";
+  filterForm.querySelector("#limit").value = "9";
+  currentPage = 1;
+  await loadDashboard();
+});
 
-  try {
-    const payload = getPayloadFromForm();
-
-    if (drinkId) {
-      await updateDrink(drinkId, payload);
-      showMessage("Drink updated successfully.", "success");
-    } else {
-      await createDrink(payload);
-      showMessage("Drink created successfully.", "success");
-      drinkForm.reset();
-    }
-
-    setTimeout(() => {
-      window.location.href = "/dashboard";
-    }, 700);
-  } catch (error) {
-    showMessage(error.message || "Failed to save drink.");
-  } finally {
-    submitButton.disabled = false;
-    submitButton.textContent = originalText;
+prevPage?.addEventListener("click", async () => {
+  if (currentPage > 1) {
+    currentPage -= 1;
+    await loadDashboard();
   }
 });
 
-await loadUserStatus();
-await loadEditMode();
+nextPage?.addEventListener("click", async () => {
+  currentPage += 1;
+  await loadDashboard();
+});
+
+await loadUserStatus(authStatus);
+await loadDashboard();
