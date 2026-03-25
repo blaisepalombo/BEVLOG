@@ -1,0 +1,123 @@
+.collapsible-panel {
+  overflow: hidden;
+}
+
+.section-toggle {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.section-toggle-icon {
+  width: 14px;
+  height: 14px;
+  border-right: 2px solid var(--secondary);
+  border-bottom: 2px solid var(--secondary);
+  transform: rotate(45deg);
+  transition: transform 180ms ease;
+  flex-shrink: 0;
+  margin-right: 0.25rem;
+}
+
+.section-toggle[aria-expanded="true"] .section-toggle-icon {
+  transform: rotate(225deg);
+}
+
+.section-content {
+  display: block;
+}
+
+.section-content[hidden] {
+  display: none !important;
+}
+
+.stats-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.stat-card {
+  padding: 1rem;
+  background: var(--panel-soft);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition:
+    transform var(--ease),
+    box-shadow var(--ease),
+    border-color var(--ease);
+  animation: fadeUp 0.45s ease both;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--border-strong);
+}
+
+.stat-label {
+  display: block;
+  color: var(--text-soft);
+  font-size: 0.92rem;
+  margin-bottom: 0.35rem;
+}
+
+.stat-card strong {
+  font-size: 1.35rem;
+  color: var(--primary);
+}
+
+.card-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.drink-card {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--panel-soft);
+  transition:
+    transform var(--ease),
+    box-shadow var(--ease),
+    border-color var(--ease);
+  animation: fadeUp 0.45s ease both;
+}
+
+.drink-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+  border-color: var(--border-strong);
+}
+
+.drink-card h3 {
+  margin: 0 0 0.4rem;
+  color: var(--primary);
+}
+
+.drink-meta,
+.card-actions,
+.filter-actions,
+.pagination-row,
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.drink-meta {
+  margin: 0.9rem 0;
+}
+
+.card-actions {
+  margin-top: 1rem;
+}

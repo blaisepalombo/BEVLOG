@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Energy Drink Tracker</title>
-  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="/css/styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -15,7 +15,7 @@
 <body>
   <header class="site-header">
     <div class="container header-row">
-      <a class="brand" href="/">Energy Drink Tracker</a>
+      <a class="brand" href="/index.html">Energy Drink Tracker</a>
 
       <button
         class="menu-toggle"
@@ -31,40 +31,67 @@
       </button>
 
       <nav class="nav-actions" id="mobileMenu">
-        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/index.html">Home</a>
         <a class="nav-link" href="/dashboard">Dashboard</a>
         <a class="nav-link" href="/form">Add Drink</a>
-        <button class="nav-link nav-link-button" id="logoutButton" type="button">Logout</button>
+        <a class="nav-link" id="authNavLink" href="/auth/google">Sign in</a>
       </nav>
     </div>
   </header>
 
   <main class="page-shell">
-    <section class="hero-card">
-      <p class="eyebrow">Frontend for the Energy Drink API</p>
-      <h1>Energy Drink Tracker</h1>
-      <p class="hero-text">
-        A simple frontend built to work with a custom Node, Express, and MongoDB API.
-        Log drinks, review entries, and manage your data through a cleaner interface.
-      </p>
+    <section class="hero-card home-hero">
+      <div class="hero-grid">
+        <div class="hero-main">
+          <p class="eyebrow">Frontend for the Energy Drink API</p>
+          <h1>Energy Drink Tracker</h1>
+          <p class="hero-text">
+            Log drinks, rate them, track caffeine and sugar, and manage everything through a cleaner frontend built with Node, Express, and MongoDB.
+          </p>
 
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="/auth/google">Sign in with Google</a>
-        <a class="btn btn-secondary" href="/dashboard">Open Dashboard</a>
-      </div>
+          <div class="hero-badges">
+            <span class="hero-badge">Fast logging</span>
+            <span class="hero-badge">Personal ratings</span>
+            <span class="hero-badge">Filter and sort</span>
+            <span class="hero-badge">Stats overview</span>
+          </div>
 
-      <div class="info-panel">
-        <h2>What this frontend does</h2>
-        <ul>
-          <li>Shows your logged-in user status</li>
-          <li>Displays drink entries from the API</li>
-          <li>Lets you add, edit, and delete drinks</li>
-          <li>Uses filtering, sorting, and stats endpoints</li>
-        </ul>
+          <div class="hero-actions">
+            <div class="hero-auth-area">
+              <a class="btn btn-primary" id="heroAuthButton" href="/auth/google">Sign in with Google</a>
+              <p class="hero-welcome" id="heroWelcome" hidden></p>
+            </div>
+            <a class="btn btn-secondary" href="/dashboard">Open Dashboard</a>
+          </div>
+        </div>
+
+        <aside class="hero-side">
+          <div class="hero-side-card">
+            <p class="eyebrow">What you can do</p>
+
+            <div class="feature-stack">
+              <div class="feature-item">
+                <strong>Add drinks quickly</strong>
+                <span>Save brand, name, caffeine, sugar, rating, notes, and purchase date.</span>
+              </div>
+
+              <div class="feature-item">
+                <strong>Browse everything easier</strong>
+                <span>Use filters, sorting, and pagination so the dashboard stays clean.</span>
+              </div>
+
+              <div class="feature-item">
+                <strong>See useful stats</strong>
+                <span>Check totals, averages, and your top brand at a glance.</span>
+              </div>
+            </div>
+          </div>
+        </aside>
       </div>
     </section>
   </main>
 
   <script src="/js/site-menu.js"></script>
+  <script type="module" src="/js/index.js"></script>
 </body>
 </html>

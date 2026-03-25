@@ -1,0 +1,64 @@
+.field-full {
+  grid-column: 1 / -1;
+}
+
+.filter-grid,
+.drink-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+label {
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.78rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text);
+  transition:
+    border-color var(--ease),
+    box-shadow var(--ease),
+    background-color var(--ease);
+}
+
+input:hover,
+select:hover,
+textarea:hover {
+  border-color: var(--border-strong);
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.btn:focus-visible,
+.section-toggle:focus-visible {
+  outline: none;
+  border-color: rgba(45, 151, 196, 0.48);
+  box-shadow: 0 0 0 4px rgba(45, 151, 196, 0.12);
+  background: white;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 130px;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  margin-top: 0.35rem;
+}

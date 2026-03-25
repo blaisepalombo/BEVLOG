@@ -1,0 +1,84 @@
+.btn {
+  appearance: none;
+  border-radius: 12px;
+  padding: 0.78rem 1.05rem;
+  min-height: 44px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: white;
+  transition:
+    transform var(--ease),
+    box-shadow var(--ease),
+    border-color var(--ease),
+    background-color var(--ease),
+    color var(--ease),
+    opacity var(--ease);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #d88769);
+  border-color: rgba(197, 111, 80, 0.3);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #bd6648, #cd7d61);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(96, 138, 157, 0.2);
+  color: var(--secondary);
+}
+
+.btn-secondary:hover {
+  background: white;
+  border-color: rgba(96, 138, 157, 0.32);
+}
+
+button:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(45, 151, 196, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(45, 151, 196, 0.15);
+  padding: 0.32rem 0.62rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.message {
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.message.error {
+  background: #ffe9e2;
+  color: var(--accent);
+}
+
+.message.success {
+  background: #e6f4fb;
+  color: var(--primary);
+}

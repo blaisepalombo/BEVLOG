@@ -116,5 +116,5 @@ drinkForm?.addEventListener("submit", async (event) => {
   }
 });
 
-await loadUserStatus(null);
+await loadUserStatus();
 await loadEditMode();
